@@ -1,4 +1,6 @@
 import socket
+from router import MiddlewareFactory, router
+from encoder import parse_request, encode_response
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind(("127.0.0.1", 8000))
@@ -14,6 +16,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 continue
 
             #TODO: parse the request, send through middleware and encode the response
-            res = "HTTP/1.1 200 Ok\nConnection: close\n\n<h1>Hello, world!</h1>"
+            request = parse_request(data)
+            if request is None:
+                res = "HTTP/1.1 200 Ok\nConnection: close\n\n<h1>Hello, world!</h1>"
+            else:
+                # Process the request through middleware
+                response = MiddlewareFactory(router)(request)
+                res = encode_response(response)
+                print(res)
 
-            connection.send(bytes(res, "UTF-8"))
+            connection.send(res)
+            connection.close()
