@@ -1,6 +1,5 @@
-import os
+import datetime
 from response import Response
-
 
 # MiddlewareFactory composes the middleware chain and returns a handler
 def MiddlewareFactory(router):
@@ -22,8 +21,8 @@ def logging_middleware(request, next_middleware):
 def static_file_middleware(request, next_middleware):
     # Serve .js and .css files from the static folder if URI contains a period
     if "." in request.uri and request.uri.startswith("/static/"):
-        file_path = os.path.join("static", request.uri[len("/static/"):])
-        if os.path.isfile(file_path):
+        file_path = "static/" + request.uri[len("/static/"):]
+        try:
             # Set correct Content-Type
             if file_path.endswith('.js'):
                 content_type = 'application/javascript'
@@ -40,7 +39,7 @@ def static_file_middleware(request, next_middleware):
                 headers={"Content-Type": content_type},
                 body=content
             )
-        else:
+        except FileNotFoundError:
             return Response(
                 version=request.version,
                 code=404,
@@ -54,25 +53,54 @@ def static_file_middleware(request, next_middleware):
 
 def router(request):
     # Handle the request and return a response
+    server_id = "My basic HTTP Server"
+    date_str = datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
+    connection = "close"
+    cache_control = "max-age=5"
 
     if request.uri == "/":
         filename = "index.html"
+    elif request.uri == "/info":
+        return Response(
+            version=request.version,
+            code=301,
+            reason="OK",
+            headers={
+                "Server": server_id,
+                "Date": date_str,
+                "Connection": connection,
+                "Cache-Control": cache_control,
+                "Location": "/about"
+                },
+            body="<h1>301 Moved Permanently</h1><p>Redirecting to <a href='/about'>/about</a></p>"
+        )
     else:
         filename = request.uri.lstrip("/")+".html"
-    filepath= os.path.join("templates", filename)
-    if os.path.isfile(filepath):
+    filepath = "templates/" + filename
+    try:
+        with open(filepath, 'r') as f:
+            text = f.read()
         return Response(
             version=request.version,
             code=200,
             reason="OK",
-            headers={"Content-Type": "text/html"},
-            body=open(filepath, 'r').read()
+            headers={"Server": server_id,
+                "Date": date_str,
+                "Connection": connection,
+                "Cache-Control": cache_control,
+                "Content-Type": "text/html",
+                "Content-Length": str(len(text.encode("utf-8"))},
+            body=text
         )
-    else:
+    except FileNotFoundError:
         return Response(
             version=request.version,
             code=404,
             reason="Not Found",
-            headers={"Content-Type": "text/html"},
+            headers={"Server": server_id,
+                "Date": date_str,
+                "Connection": connection,
+                "Cache-Control": cache_control,
+                "Content-Type": "text/html"},
             body="<h1>404 Not Found</h1><p>The requested file was not found on this server.</p>"
         )
