@@ -15,15 +15,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 connection.close()
                 continue
 
-            #TODO: parse the request, send through middleware and encode the response
             request = parse_request(data)
-            if request is None:
-                res = "HTTP/1.1 200 Ok\nConnection: close\n\n<h1>Hello, world!</h1>"
-            else:
-                # Process the request through middleware
-                response = MiddlewareFactory(router)(request)
-                res = encode_response(response)
-                print(res)
+            # Process the request through middleware
+            response = MiddlewareFactory(router)(request)
+            res = encode_response(response)
+            print(res)
 
             connection.send(res)
             connection.close()

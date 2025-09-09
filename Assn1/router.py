@@ -54,7 +54,7 @@ def static_file_middleware(request, next_middleware):
 def router(request):
     # Handle the request and return a response
     server_id = "My basic HTTP Server"
-    date_str = datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
+    date_str = datetime.datetime.now().strftime("%a, %d %b %Y %H:%M:%S GMT")
     connection = "close"
     cache_control = "max-age=5"
 
@@ -75,7 +75,9 @@ def router(request):
             body="<h1>301 Moved Permanently</h1><p>Redirecting to <a href='/about'>/about</a></p>"
         )
     else:
-        filename = request.uri.lstrip("/")+".html"
+        filename = request.uri.lstrip("/")
+        if not filename.endswith(".html"):
+            filename += ".html"
     filepath = "templates/" + filename
     try:
         with open(filepath, 'r') as f:
@@ -89,7 +91,7 @@ def router(request):
                 "Connection": connection,
                 "Cache-Control": cache_control,
                 "Content-Type": "text/html",
-                "Content-Length": str(len(text.encode("utf-8"))},
+                "Content-Length": str(len(text.encode("utf-8")))},
             body=text
         )
     except FileNotFoundError:
