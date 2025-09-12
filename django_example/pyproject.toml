@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "django-example"
+version = "0.1.0"
+description = ""
+authors = ["Dallin Matthew Moon <A02338740@usu.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.2.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
