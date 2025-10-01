@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Tracker</title>
+    <link rel="stylesheet" href="{% static 'Tracker/styles.css' %}">
+    <script src="{% static 'Tracker/functions.js' %}"></script>
+</head>
+<body>
+    <h1>Welcome to the Activity Tracker</h1>
+    <div id="actions">
+        <a href="/new_activity/">Create New Activity</a>
+    </div>
+    <h2>Activities</h2>
+    <ul id="activity_list">
+        {% for activity in activities %}
+            <li>
+                <div id="activity">
+                    <a href="{% url 'activity' id=activity.id %}">{{ activity.name }}</a>
+                    
+                    <span id="timelogs">
+                        {% for timelog in timelogs %}
+                            {% if timelog.activity_id == activity.id %}
+                            <div>Date: {{ timelog.start_time|date:"M d, Y" }} | Duration: {{ timelog.start_time|timesince:timelog.end_time }}</div>
+                        {% endif %}
+                        {% empty %}
+                            <div>No time logs available.</div>
+                        {% endfor %}
+                        <div id="total_time">Total Time: {{ activity.time_spent }}</div>
+                    </span>
+                    <form method="post" action="{% url 'delete_activity' id=activity.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Are you sure?')">Delete Activity</button>
+                    </form>
+                </div>
+            </li>
+        {% empty %}
+            <li>No activities available. <a href="/new_activity/">Create one now!</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

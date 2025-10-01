@@ -1,0 +1,31 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Tracker - {{ activity.name }}</title>
+    <link rel="stylesheet" href="{% static 'Tracker/styles.css' %}">
+</head>
+<body>
+    <h1>Activity: {{ activity.name }}</h1>
+    <div id="actions">
+        <a href="{% url 'new_timelog' id=activity.id %}">Add Time Log</a> |
+        <a href="{% url 'new_activity' %}">Create New Activity</a> |
+        <a href="{% url 'index' %}">Back to Home</a>
+    </div>
+    <h2>Time Logs</h2>
+    <ul>
+        {% for timelog in timelogs %}
+            <li>Start: {{ timelog.start_time }} | End: {{ timelog.end_time }}</li>
+        {% empty %}
+            <li>No time logs available for this activity.</li>
+        {% endfor %}
+    </ul>
+    <form method="post" action="{% url 'delete_activity' id=activity.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" onclick="return confirm('Are you sure?')">Delete Activity</button>
+    </form>
+</body>
+</html>

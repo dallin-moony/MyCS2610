@@ -1,0 +1,25 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Timelog</title>
+    <link rel="stylesheet" href="{% static 'Tracker/styles.css' %}">
+</head>
+<body>
+    <h1>Create a new timelog for {{ activity.name }}!</h1>
+    <div id="actions">
+        <a href="{% url 'new_timelog' id=activity.id %}">Add Time Log</a> |
+        <a href="{% url 'new_activity' %}">Create New Activity</a> |
+        <a href="{% url 'index' %}">Back to Home</a>
+    </div>
+    <form action="{% url 'new_timelog' id=activity.id %}" method="post">
+        {% csrf_token %}
+        <input type="datetime-local" name ="start_time" required>
+        <input type="datetime-local" name ="end_time" required>
+        <button type="submit">Create Time Log</button>
+    </form>
+</body>
+</html>
