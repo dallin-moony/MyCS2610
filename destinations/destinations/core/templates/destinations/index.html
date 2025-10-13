@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destinations</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'destinations/styles.css' %}">
+</head>
+<body>
+    <div id="menu">
+        <a href="{% url '/' %}">Home</a>
+        <a href="{% url 'create_destination' %}">Add Destination Review</a>
+        <a href="{% url 'destinations' %}">View Your Destinations</a>
+        {% if  not session %}
+        <a href="{% url 'create_user' %}">Sign Up</a>
+        <a href="{% url 'create_session' %}">Sign In</a>
+        {% else %}
+        <form method="post" action="{% url 'destroy_session' %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="link-like">Sign Out</button>
+        </form>
+        {% endif %}
+    </div>
+    <h1>Welcome to the destinations app! Where only the happiest travelers come! Log your travels with us and see what others are up to!</h1>
+    <div id="destinations">
+        {% for destination in destinations %}
+            {% if destination.share_publicly or destination.user == request.current_user %}
+            <div class="destination">
+                <h2>{{ destination.name }}</h2>
+                <p>Rating: {{ destination.rating }}</p>
+                <p>Review: {{ destination.review }}</p>
+                
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</body>
+</html>

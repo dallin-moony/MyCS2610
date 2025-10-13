@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destinations</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'destinations/styles.css' %}">
+</head>
+<body>
+    <div id="menu">
+        <a href="{% url '/' %}">Home</a>
+        <a href="{% url 'create_destination' %}">Add Destination Review</a>
+        {% if not session %}
+        <a href="{% url 'create_user' %}">Sign Up</a>
+        <a href="{% url 'create_session' %}">Sign In</a>
+        {% else %}
+        <form method="post" action="{% url 'destroy_session' %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="link-like">Sign Out</button>
+        </form>
+        
+        {% endif %}
+    </div>
+    <div id="destinations">
+        {% for destination in destinations %}
+            <div class="destination">
+                <h2>{{ destination.name }}</h2>
+                <p>Rating: {{ destination.rating }}</p>
+                <p>Review: {{ destination.review }}</p>
+                <a href="{% url 'edit_destination' destination.id %}">Edit Details</a>
+            </div>
+        {% endfor %}
+    </div>
+    <div id="new_destination">
+        <a href="{% url 'create_destination' %}">Add a New Destination Review</a>
+    </div>
+</body>
+</html>
