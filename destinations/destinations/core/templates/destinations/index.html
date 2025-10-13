@@ -26,12 +26,11 @@
     <div id="destinations">
         {% for destination in destinations %}
             {% if destination.share_publicly or destination.user == request.current_user %}
-            <div class="destination">
+            <a class="destination" href="{% url 'edit_destination' destination.id %}">
                 <h2>{{ destination.name }}</h2>
                 <p>Rating: {{ destination.rating }}</p>
                 <p>Review: {{ destination.review }}</p>
-                
-            </div>
+            </a>
             {% endif %}
         {% endfor %}
     </div>

@@ -40,7 +40,7 @@ def create_destination(request):
         share_publicly = 'share_publicly' in request.POST
         session = getattr(request, 'current_session', None)
         if not session:
-            return HttpResponse("Unauthorized", status=401)
+            return HttpResponse("Unauthorized. You must be signed in to do this.", status=401)
         user = request.current_user
         Destination.objects.create(name=name, review=review, rating=rating, user=user, share_publicly=share_publicly)
         return redirect('index')
@@ -99,11 +99,11 @@ def destinations(request):
 def edit_destination(request, destination_id):
     session = getattr(request, 'current_session', None)
     if not session:
-        return HttpResponse("Unauthorized", status=404)
+        return HttpResponse("Unauthorized. You must be signed in to do this.", status=404)
     try:
         destination = Destination.objects.get(id=destination_id, user=session.user)
     except Destination.DoesNotExist:
-        return HttpResponse("Destination not found", status=404)
+        return HttpResponse("Destination does not exist or it is not your destination.", status=404)
 
     if request.method == 'POST':
         destination.name = request.POST.get('name')
@@ -118,7 +118,7 @@ def edit_destination(request, destination_id):
 def delete_destination(request, destination_id):
     session = getattr(request, 'current_session', None)
     if not session:
-        return HttpResponse("Unauthorized", status=404)
+        return HttpResponse("Unauthorized. You must be signed in to do this.", status=404)
     try:
         destination = Destination.objects.get(id=destination_id, user=session.user)
     except Destination.DoesNotExist:
