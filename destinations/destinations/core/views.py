@@ -93,7 +93,7 @@ def destinations(request):
         destinations = Destination.objects.filter(user=session.user)
     else:
         # Show only publicly shared destinations for anonymous users
-        destinations = Destination.objects.filter(share_publicly=True)
+        return redirect('index')
     return render(request, 'destinations/destinations.html', {'destinations': destinations, 'session': session})
 
 def edit_destination(request, destination_id):
