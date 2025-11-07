@@ -57,31 +57,92 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.phrases {
+  margin-top: 5vh;
+  font-size: 3em;
+  text-align: center;
+  max-width: 800px;
+}
+
+.current {
+  text-decoration: underline;
+}
+.correct {
+  color: #646cff;
+}
+
 .keyboard {
-  display: grid;
-  grid-template-rows: repeat(14, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-  margin-top: 20vh;
+  margin-top: 10vh;
   border: black solid 2px;
-  padding: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-right: 30px;
+  padding-left: 30px;
   border-radius: 10px;
   height: 40vh;
-  width: 80vw;
+  max-width: 90vw;
+  min-width: fit-content;
   box-shadow: #f9f9f9 0px 0px 10px 0px;
   justify-content: center;
 }
 
 .key-row {
-  display: grid;
-  grid-template-columns: repeat(14, minmax(0, 1fr));
-  gap: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  height: 60px;
   justify-content: center;
   align-items: center;
 }
 
-.isPressed {
-  background-color: #646cff;
-  color: white;
+.key {
+  margin: 5px;
+  height: 60px;
+  width: 60px;
+  text-align: center;
+  border: black solid 2px;
+  border-radius: 8px;
+  font-size: 2.5em;
+  box-shadow: rgba(255, 255, 255, 0.25) 0px 2px 5px -1px, rgba(255, 255, 255, 0.3) 0px 1px 3px -1px;
+  /* animate transform and shadow when key state changes */
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.key[data-label=" "] {
+  width: 500px;
+}
+
+.key[data-label="Shift"] {
+  width: 120px;
+}
+
+.pressed {
+  /* move the key down 2px and remove shadow over 0.5s */
+  transform: translateY(2px);
+  box-shadow: none;
+}
+
+.next-key {
+  box-shadow: rgb(255, 0, 0) 0px 2px 5px -1px, rgb(255, 0, 0) 0px 1px 3px -1px;
+  transition: box-shadow 0.1s ease;
+}
+
+.next-key.pressed {
+  box-shadow: none;
 }
 
 @media (prefers-color-scheme: light) {

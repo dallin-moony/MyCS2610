@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Key from './key';
 import Phrase from './phrase';
 
@@ -38,8 +38,9 @@ const quotes = [
 const baseKeys = [
 ['1','2','3','4','5','6','7','8','9','0','-','='],
 ['q','w','e','r','t','y','u','i','o','p','[',']'],
-['','a','s','d','f','g','h','j','k','l',';',"'",''],
+['a','s','d','f','g','h','j','k','l',';',"'"],
 ['Shift','z','x','c','v','b','n','m',',','.','/','Shift'],
+[' ']
 ];
 
 const shiftMap = {
@@ -88,57 +89,27 @@ const shiftMap = {
 '/':'?',
 '-':'_',
 '=':'+',
-'':'',
+' ':' ',
 'Shift':'Shift'
 };
 
 function Keyboard() {
     const [isShifted, setIsShifted] = useState(false);
-    const [isPressed, setIsPressed] = useState("");
+    // use null as the "no key pressed" sentinel so it doesn't collide with empty-string labels
+    const [pressedKeys, setPressedKeys] = useState(new Set());
     const [currentPhrase, setPhrase] = useState(0);
     const [currentLetter, setLetter] = useState(0);
     const correctLetter = quotes[currentPhrase][currentLetter];
 
     /*Note to self: useEffect is a side effect hook that will happen on render. The [] at the end means it will render only once*/
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === 'Shift') {
-                setIsShifted(true);
-            }
-        };
 
-        const handleKeyUp = (e) => {
-            if (e.key === 'Shift') {
-                setIsShifted(false);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        };
-    }, []);
 
     useEffect(() => {
         const handleKeyPress = (e) => {
-            setIsPressed(e.key);
-        };
-
-        const handleKeyUpPress = () => setIsPressed("");
-
-        window.addEventListener('keydown', handleKeyPress);
-        window.addEventListener('keyup', handleKeyUpPress);
-        return () => {
-            window.removeEventListener('keydown', handleKeyPress);
-            window.removeEventListener('keyup', handleKeyUpPress);
-        };
-    }, []);
-
-    useEffect(() => {
-        const keydownHandler = (e) => {
+            if (e.repeat) return;
+            if (e.key === 'Shift') {
+                setIsShifted(true);
+            }
             if (e.key === correctLetter) {
                 setLetter((prev) => prev + 1);
                 if (currentLetter + 1 === quotes[currentPhrase].length) {
@@ -146,22 +117,47 @@ function Keyboard() {
                     setLetter(0);
                 }
             }
+            setPressedKeys((prev) => new Set(prev).add(e.key));
         };
-        window.addEventListener('keydown', keydownHandler);
+
+        const handleKeyUpPress = (e) => {
+            console.log(e.key);
+            if (e.key === 'Shift') {
+                setIsShifted(false);
+            }
+            setPressedKeys((prev) => {
+                const newPressed = new Set(prev);
+                newPressed.delete(e.key);
+                return newPressed;
+            });
+        };
+
+        window.addEventListener('keydown', handleKeyPress);
+        window.addEventListener('keyup', handleKeyUpPress);
         return () => {
-            window.removeEventListener('keydown', keydownHandler);
+            window.removeEventListener('keydown', handleKeyPress);
+            window.removeEventListener('keyup', handleKeyUpPress);
         };
-    }, [correctLetter, currentLetter, currentPhrase]);
+    }, [ correctLetter, currentLetter, currentPhrase]);
 
     return (
-        <div>
+        <div className="app">
             <Phrase quotes={quotes} currentPhrase={currentPhrase} currentLetter={currentLetter} />
             <div className="keyboard">
                 {baseKeys.map((row, rowIndex) => (
                     <div key={rowIndex} className="key-row">
-                        {row.map((keyLabel, keyIndex) => (
-                            <Key key={keyIndex} label={isShifted ? shiftMap[keyLabel] : keyLabel} className={isPressed === keyLabel ? "pressed" : ""}/>
-                        ))}
+                        {row.map((keyLabel, keyIndex) => {
+                            const renderedLabel = isShifted ? (shiftMap[keyLabel] ?? keyLabel) : keyLabel;
+                            const isDown = pressedKeys.has(renderedLabel);
+                            const isNext = renderedLabel === correctLetter;
+                            let className = isDown ? 'pressed' : isNext ? 'next-key' : '';
+                            const needsShift = !baseKeys.flat().includes(correctLetter);
+                            console.log(correctLetter, needsShift);
+                            if (renderedLabel === 'Shift' && needsShift) {
+                                className += ' next-key';
+                            }
+                            return <Key key={keyIndex} label={renderedLabel} className={className} />;
+                        })}
                     </div>
                 ))}
             </div>
