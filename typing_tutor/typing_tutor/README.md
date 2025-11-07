@@ -8,3 +8,4 @@
     * Next correct key is highlighted (shadow)
         * This includes the shift key. It will be highlighted if the next letter is capitalized or if it is a symbol that requires the shift key to be held. It will then highlight the correct (capitalized) key.
     * Keyboard updates to capitalized keys and symbols when the shift key is pressed.
+    * Multiple keys can be pressed

@@ -121,13 +121,11 @@ function Keyboard() {
         };
 
         const handleKeyUpPress = (e) => {
-            console.log(e.key);
             if (e.key === 'Shift') {
                 setIsShifted(false);
             }
             setPressedKeys((prev) => {
-                const newPressed = new Set(prev);
-                newPressed.delete(e.key);
+                const newPressed = new Set(prev).delete(e.key);
                 return newPressed;
             });
         };
@@ -144,22 +142,26 @@ function Keyboard() {
         <div className="app">
             <Phrase quotes={quotes} currentPhrase={currentPhrase} currentLetter={currentLetter} />
             <div className="keyboard">
-                {baseKeys.map((row, rowIndex) => (
+                {(() => {
+                    const flatBaseKeys = baseKeys.flat();
+                    const needsShift = flatBaseKeys.some(k => (shiftMap[k] ?? k) === correctLetter);
+                    return baseKeys.map((row, rowIndex) => (
                     <div key={rowIndex} className="key-row">
                         {row.map((keyLabel, keyIndex) => {
                             const renderedLabel = isShifted ? (shiftMap[keyLabel] ?? keyLabel) : keyLabel;
                             const isDown = pressedKeys.has(renderedLabel);
-                            const isNext = renderedLabel === correctLetter;
-                            let className = isDown ? 'pressed' : isNext ? 'next-key' : '';
-                            const needsShift = !baseKeys.flat().includes(correctLetter);
-                            console.log(correctLetter, needsShift);
-                            if (renderedLabel === 'Shift' && needsShift) {
-                                className += ' next-key';
-                            }
-                            return <Key key={keyIndex} label={renderedLabel} className={className} />;
+                            const isBaseNext = (renderedLabel === correctLetter) || ((shiftMap[keyLabel] ?? keyLabel) === correctLetter);
+
+                            const classes = [];
+                            if (isDown) classes.push('pressed');
+                            if (isBaseNext) classes.push('next-key');
+                            if (keyLabel === 'Shift' && needsShift) classes.push('next-key');
+
+                            return <Key key={keyIndex} label={renderedLabel} className={classes.join(' ')} />;
                         })}
                     </div>
-                ))}
+                ))
+                })()}
             </div>
         </div>
     );
