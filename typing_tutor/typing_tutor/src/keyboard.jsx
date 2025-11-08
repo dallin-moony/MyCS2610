@@ -117,7 +117,11 @@ function Keyboard() {
                     setLetter(0);
                 }
             }
-            setPressedKeys((prev) => new Set(prev).add(e.key));
+            setPressedKeys((prev) => {
+                const newPressed = new Set(prev);
+                newPressed.add(e.key);
+                return newPressed;
+            });
         };
 
         const handleKeyUpPress = (e) => {
@@ -125,7 +129,8 @@ function Keyboard() {
                 setIsShifted(false);
             }
             setPressedKeys((prev) => {
-                const newPressed = new Set(prev).delete(e.key);
+                const newPressed = new Set(prev)
+                newPressed.delete(e.key);
                 return newPressed;
             });
         };
@@ -146,6 +151,7 @@ function Keyboard() {
                     <div key={rowIndex} className="key-row">
                         {row.map((keyLabel, keyIndex) => {
                             const renderedLabel = isShifted ? (shiftMap[keyLabel] ?? keyLabel) : keyLabel;
+                            console.log(pressedKeys);
                             const isDown = pressedKeys.has(renderedLabel);
                             const isNext = renderedLabel === correctLetter;
                             let className = isDown ? 'pressed' : isNext ? 'next-key' : '';
