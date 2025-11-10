@@ -95,7 +95,6 @@ const shiftMap = {
 
 function Keyboard() {
     const [isShifted, setIsShifted] = useState(false);
-    // use null as the "no key pressed" sentinel so it doesn't collide with empty-string labels
     const [pressedKeys, setPressedKeys] = useState(new Set());
     const [currentPhrase, setPhrase] = useState(0);
     const [currentLetter, setLetter] = useState(0);
